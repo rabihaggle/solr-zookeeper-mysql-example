@@ -1,0 +1,90 @@
+# a docker-compose.yml to start a simple cluster with three ZooKeeper nodes and three Solr nodes.
+#
+# To use:
+#
+# mkdir mycluster
+# cd mycluster
+# curl --output docker-compose.yml https://raw.githubusercontent.com/docker-solr/docker-solr-examples/master/docker-compose/docker-compose.yml
+# docker-compose up
+#
+version: '3.7'
+services:
+  solr1:
+    image: solr:8.7.0
+    container_name: solr1
+    ports:
+      - "8981:8983"
+    environment:
+      - ZK_HOST=zoo1:2181
+    networks:
+      - solr
+    depends_on:
+      - zoo1
+
+  solr2:
+    image: solr:8.7.0
+    container_name: solr2
+    ports:
+      - "8982:8983"
+    environment:
+      - ZK_HOST=zoo1:2181
+    networks:
+      - solr
+    depends_on:
+      - zoo1
+
+  solr3:
+    image: solr:8.7.0
+    container_name: solr3
+    ports:
+      - "8983:8983"
+    environment:
+      - ZK_HOST=zoo1:2181
+    networks:
+      - solr
+    depends_on:
+      - zoo1
+
+  zoo1:
+    image: zookeeper:3.6.2
+    container_name: zoo1
+    restart: always
+    hostname: zoo1
+    ports:
+      - 2181:2181
+      - 7001:7000
+    environment:
+      ZOO_MY_ID: 1
+      ZOO_SERVERS: server.1=zoo1:2888:3888;2181
+      ZOO_4LW_COMMANDS_WHITELIST: mntr, conf, ruok
+      ZOO_CFG_EXTRA: "metricsProvider.className=org.apache.zookeeper.metrics.prometheus.PrometheusMetricsProvider metricsProvider.httpPort=7000 metricsProvider.exportJvmInfo=true"
+    networks:
+      - solr
+
+  db:
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_DATABASE: 'db'
+      # So you don't have to use root, but you can if you like
+      MYSQL_USER: 'user'
+      # You can use whatever password you like
+      MYSQL_PASSWORD: 'password'
+      # Password for root access
+      MYSQL_ROOT_PASSWORD: 'password'
+    ports:
+      # <Port exposed> : <MySQL Port running inside container>
+      - '3306:3306'
+    expose:
+      # Opens port 3306 on the container
+      - '3306'
+      # Where our data will be persisted
+    volumes:
+      - my-db:/var/lib/mysql
+    networks:
+      - solr
+# Names our volume
+volumes:
+  my-db:
+networks:
+  solr:
