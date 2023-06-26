@@ -81,6 +81,7 @@ services:
       # Where our data will be persisted
     volumes:
       - my-db:/var/lib/mysql
+      - ./mysql:/docker-entrypoint-initdb.d
     networks:
       - solr
 # Names our volume
