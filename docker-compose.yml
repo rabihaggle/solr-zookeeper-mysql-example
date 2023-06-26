@@ -16,6 +16,7 @@ services:
       - "8981:8983"
     environment:
       - ZK_HOST=zoo1:2181
+      - SOLR_HEAP=800m
     networks:
       - solr
     depends_on:
@@ -28,6 +29,7 @@ services:
       - "8982:8983"
     environment:
       - ZK_HOST=zoo1:2181
+      - SOLR_HEAP=800m
     networks:
       - solr
     depends_on:
@@ -40,6 +42,7 @@ services:
       - "8983:8983"
     environment:
       - ZK_HOST=zoo1:2181
+      - SOLR_HEAP=800m
     networks:
       - solr
     depends_on:
@@ -80,8 +83,8 @@ services:
       - '3306'
       # Where our data will be persisted
     volumes:
-      - my-db:/var/lib/mysql
-      - ./mysql:/docker-entrypoint-initdb.d
+      - ./my-db:/var/lib/mysql
+      - ./mysql/dump.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - solr
 # Names our volume
