@@ -87,6 +87,20 @@ services:
       - ./mysql/dump.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - solr
+  zoonavigator:
+    container_name: zoonavigator
+    image: elkozmon/zoonavigator
+    ports:
+      - 9000:9000
+    environment:
+      HTTP_PORT: 9000
+      AUTO_CONNECT_CONNECTION_STRING: 'zoo1:2181'
+      ZK_CLIENT_TIMEOUT_MILLIS: 5000
+      ZK_CONNECT_TIMEOUT_MILLIS: 5000
+      ZK_SASL_CLIENT: 'false'
+      ZK_CLIENT_CNXN_SOCKET: 'org.apache.zookeeper.ClientCnxnSocketNIO'
+    networks:
+      - solr
 # Names our volume
 volumes:
   my-db:
